@@ -1,0 +1,260 @@
+<meta charset="utf-8">
+<title>TaskAlpha, Flipside and Pulsar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one 1040 column, sections stacked; wide tables and the diagram scroll in their own boxes */
+:root {
+  --bg: #F3F6F9; --surface: #FFFFFF; --ink: #0D1B2A; --muted: #4A5A6C;
+  --line: #D3DDE7; --accent: #1B6CA8; --accent-soft: #E3EEF8; --data: #6B7B8C;
+  --good: #1F7A4D; --warn: #B54708; --sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B1622; --surface: #13222F; --ink: #E8EEF4; --muted: #9DB0C3;
+  --line: #263849; --accent: #5FA3DC; --accent-soft: #16304A; --data: #8A9BAD;
+  --good: #4CC38A; --warn: #F5A04A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0B1622; --surface: #13222F; --ink: #E8EEF4; --muted: #9DB0C3;
+  --line: #263849; --accent: #5FA3DC; --accent-soft: #16304A; --data: #8A9BAD;
+  --good: #4CC38A; --warn: #F5A04A; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 64px; }
+.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+header { display: flex; flex-direction: column; gap: 12px; border-bottom: 2px solid var(--ink); padding-bottom: 24px; }
+.eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 26px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-size: 17px; margin: 0; }
+p { margin: 0; }
+.meta { color: var(--muted); font-size: 14px; }
+nav ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; font-weight: 700; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+section { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 16px; }
+.sec-head { display: flex; flex-direction: column; gap: 6px; }
+.sub { color: var(--muted); max-width: 68ch; }
+
+.grid { display: grid; gap: 16px; }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) { .g3, .g2 { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.key { border: 2px solid var(--accent); background: var(--accent-soft); }
+.tag { font-size: 13px; font-weight: 700; color: var(--accent); }
+.card p, .card li { color: var(--muted); font-size: 15px; }
+.card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.note { background: var(--accent-soft); border-radius: 8px; padding: 14px 18px; font-size: 15px; }
+
+.table-box { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+th { font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: none; }
+.ref td:first-child { font-weight: 700; }
+tr.hl td { background: var(--accent-soft); }
+
+/* explainer */
+.figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.fig { border-top: 3px solid var(--accent); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.fig b { font-size: clamp(24px, 3.4vw, 34px); color: var(--accent); font-variant-numeric: tabular-nums; }
+.fig span { color: var(--muted); font-size: 14px; }
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; color: var(--muted); }
+.sw { display: inline-block; width: 22px; height: 3px; vertical-align: middle; margin-right: 6px; }
+ol.rules { margin: 0; padding-left: 22px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 32px; }
+@media (max-width: 760px) { ol.rules { grid-template-columns: 1fr; } }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Team hub &middot; Flipside and TaskAlpha</p>
+  <h1>TaskAlpha, Flipside and Pulsar</h1>
+  <p class="meta">How the model works, as of 27 October 2026. Internal only: the intercompany agreements are drafts and the OpenAI contract is confidential.</p>
+  <nav aria-label="Sections"><ul>
+    <li><a href="#model">How it works</a></li>
+    <li><a href="#flows">Who pays whom</a></li>
+    <li><a href="#channels">Supply channels</a></li>
+    <li><a href="#pulsar">Pulsar</a></li>
+    <li><a href="#rules">Ground rules</a></li>
+    <li><a href="#calendar">Calendar</a></li>
+  </ul></nav>
+</header>
+
+<section id="model">
+  <div class="sec-head"><p class="eyebrow">How it works</p>
+  <h2>Flipside sells and delivers. TaskAlpha runs the platform and pays the people who collect.</h2></div>
+  <div class="grid g3">
+    <div class="card"><span class="tag">Now to 31 Dec 2026</span><p>Pilot on the draft agreements. No charge either way; each company carries its own costs.</p></div>
+    <div class="card"><span class="tag">From 1 Jan 2027</span><p>Intercompany agreements signed and billing starts, once Eric Suzuki is in Singapore.</p></div>
+    <div class="card"><span class="tag">Project Pulsar</span><p>First project that has to run exactly as the agreements say. Revenue expected from January 2027.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><p class="eyebrow">The three companies</p><h2>One chain of ownership</h2>
+  <p class="sub">Nexscient owns TaskAlpha; TaskAlpha owns Flipside. All group money is Nexscient money. The agreements exist to keep us compliant in Singapore and the Philippines, not to count beans between the two companies.</p></div>
+  <div class="grid g3">
+    <div class="card"><span class="tag">US &middot; OTCQB: NXNT</span><h3>Nexscient, Inc.</h3><p>Listed parent. Data engineering for physical and embodied AI. Owns TaskAlpha.</p></div>
+    <div class="card key"><span class="tag">Singapore &middot; formerly Crestview BPO Pte. Ltd.</span><h3>TaskAlpha Pte. Ltd.</h3><p>Owns and runs taskalpha.io. Signs and pays contributors and vendors from its Aspire account. Sets rate cards and platform policies.</p></div>
+    <div class="card"><span class="tag">Philippines &middot; PEZA, Manila and Cebu</span><h3>Flipside AI</h3><p>Sells to clients, all foreign. Designs projects, does Tier 2 acceptance, annotation, review and dataset engineering.</p></div>
+  </div>
+  <p class="note"><b>Why Singapore.</b> No Philippine withholding on contributor pay, Singapore IP credibility, liability kept away from Flipside, and a base for Southeast Asia. TaskAlpha is one supply channel, not the only one: Flipside still covers most supply itself from the Philippines.</p>
+</section>
+
+<section id="flows">
+  <div class="sec-head"><p class="eyebrow">How money and data move</p><h2>Who pays whom</h2>
+  <p class="sub">Clients pay Flipside. Flipside buys accepted data from TaskAlpha under one monthly fee, and TaskAlpha pays the people who collected it. Flipside charges TaskAlpha for staff time spent on TaskAlpha work.</p></div>
+  <div class="diagram">
+    <svg viewBox="0 0 1040 380" role="img" aria-label="Money runs from clients to Flipside to TaskAlpha to contributors; data runs back; TaskAlpha pays Flipside a recharge; Flipside pays only its own supply">
+      <defs>
+        <marker id="m-money" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent)"/></marker>
+        <marker id="m-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--data)"/></marker>
+      </defs>
+      <g style="fill:var(--surface);stroke:var(--line)" stroke-width="1.5">
+        <rect x="10" y="110" width="170" height="90" rx="8"/>
+        <rect x="293" y="110" width="170" height="90" rx="8"/>
+        <rect x="859" y="110" width="170" height="90" rx="8"/>
+        <rect x="283" y="280" width="190" height="80" rx="8"/>
+      </g>
+      <rect x="576" y="110" width="170" height="90" rx="8" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="2.5"/>
+      <g fill="none" stroke-width="2.5">
+        <path d="M180 135H293" style="stroke:var(--accent)" marker-end="url(#m-money)"/>
+        <path d="M463 135H576" style="stroke:var(--accent)" marker-end="url(#m-money)"/>
+        <path d="M746 135H859" style="stroke:var(--accent)" marker-end="url(#m-money)"/>
+        <path d="M859 175H746" style="stroke:var(--data)" marker-end="url(#m-data)"/>
+        <path d="M576 175H463" style="stroke:var(--data)" marker-end="url(#m-data)"/>
+        <path d="M293 175H180" style="stroke:var(--data)" marker-end="url(#m-data)"/>
+        <path d="M661 110V60H378V110" style="stroke:var(--accent)" marker-end="url(#m-money)"/>
+        <path d="M378 200V280" style="stroke:var(--accent)" marker-end="url(#m-money)"/>
+      </g>
+      <g font-family="Arial, sans-serif" text-anchor="middle" style="fill:var(--ink)">
+        <text x="95" y="150" font-size="15" font-weight="700">Clients</text>
+        <text x="95" y="170" font-size="12.5" style="fill:var(--muted)">OpenAI and others</text>
+        <text x="378" y="150" font-size="15" font-weight="700">Flipside AI</text>
+        <text x="378" y="170" font-size="12.5" style="fill:var(--muted)">Philippines</text>
+        <text x="661" y="150" font-size="15" font-weight="700">TaskAlpha Pte. Ltd.</text>
+        <text x="661" y="170" font-size="12.5" style="fill:var(--muted)">Singapore</text>
+        <text x="944" y="142" font-size="15" font-weight="700">Contributors</text>
+        <text x="944" y="160" font-size="15" font-weight="700">and vendors</text>
+        <text x="944" y="180" font-size="12.5" style="fill:var(--muted)">TaskAlpha terms</text>
+        <text x="378" y="306" font-size="15" font-weight="700">Flipside-paid supply</text>
+        <text x="378" y="326" font-size="12.5" style="fill:var(--muted)">Staff, session participants,</text>
+        <text x="378" y="343" font-size="12.5" style="fill:var(--muted)">legacy contributors</text>
+        <text x="236" y="126" font-size="13">USD fees</text>
+        <text x="519" y="126" font-size="13">SOW 1 fee</text>
+        <text x="802" y="126" font-size="13">payouts</text>
+        <text x="236" y="193" font-size="13" style="fill:var(--muted)">datasets</text>
+        <text x="519" y="193" font-size="13" style="fill:var(--muted)">accepted data</text>
+        <text x="802" y="193" font-size="13" style="fill:var(--muted)">uploads</text>
+        <text x="519" y="50" font-size="13">SOW 2: support-hat recharge</text>
+        <text x="390" y="245" font-size="13" text-anchor="start">Flipside pays</text>
+      </g>
+    </svg>
+  </div>
+  <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Money</span><span><i class="sw" style="background:var(--data)"></i>Data</span><span>Nothing runs from Flipside to a TaskAlpha contributor or vendor.</span></div>
+</section>
+
+<section>
+  <div class="sec-head"><p class="eyebrow">Who does what</p><h2>Flipside staff wear two hats</h2>
+  <p class="sub">Which hat you are wearing decides which company carries the cost.</p></div>
+  <div class="grid g2">
+    <div class="card"><span class="tag">Customer hat &middot; Flipside cost</span>
+      <ul><li>Client work and project design</li><li>Tier 2 acceptance</li><li>Field sourcing, logistics and workplace partners</li><li>Legacy contributors</li></ul></div>
+    <div class="card key"><span class="tag">Support hat &middot; recharged to TaskAlpha monthly</span>
+      <ul><li>Contributor and vendor marketing under the TaskAlpha brand</li><li>support@taskalpha.io help desk, onboarding and KYC</li><li>Vendor admin and the Payout team</li><li>First-line platform QA</li><li>Platform engineering, with the IP sitting with TaskAlpha</li></ul></div>
+  </div>
+  <p class="note">Rate cards, policies and agreements are TaskAlpha&rsquo;s. Flipside staff apply them and do not set or negotiate them; anything outside the rate card goes to the Singapore director. Eric Suzuki takes that role from January 2027. Nobody logs hours: the recharge follows an FTE allocation by role, confirmed quarterly by the Service Delivery Manager.</p>
+</section>
+
+<section>
+  <div class="sec-head"><p class="eyebrow">Intercompany, from January 2027</p><h2>Two SOWs, both billed monthly</h2></div>
+  <div class="table-box"><table class="ref">
+    <thead><tr><th>SOW</th><th>Who pays whom</th><th>For what</th><th>Billing</th></tr></thead>
+    <tbody>
+      <tr><td>SOW 1</td><td>Flipside pays TaskAlpha</td><td>Accepted data collected through the platform. Scope stays data collection only; annotation and review are Flipside&rsquo;s PEZA-registered activities.</td><td>One monthly Data Collection Services Fee</td></tr>
+      <tr><td>SOW 2</td><td>TaskAlpha pays Flipside</td><td>Support-hat staff time and platform engineering</td><td>Monthly on estimate, reconciled quarterly to the FTE allocation</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note"><b>Payouts run on Aspire only.</b> Contributors and vendors are paid the same way: a bulk file every two weeks, after Tier 2 acceptance. The Flipside Payout team prepares, runs and reconciles it from TaskAlpha&rsquo;s accounts; Finance reviews totals. Each contributor has one payout destination, checked at onboarding.</p>
+</section>
+
+<section id="channels">
+  <div class="sec-head"><p class="eyebrow">Supply channels</p><h2>Who signs them decides who pays them</h2>
+  <p class="sub">Each project picks its channels at setup. The same person is not paid on two channels for the same project.</p></div>
+  <div class="table-box"><table class="ref">
+    <thead><tr><th>Channel</th><th>Contract</th><th>Paid by</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Platform contributor</td><td>TaskAlpha Terms and Project Terms</td><td>TaskAlpha</td><td>Rate card per accepted unit, every two weeks via Aspire, after Tier 2</td></tr>
+      <tr><td>Vendor or agency</td><td>TaskAlpha Vendor Agreement</td><td>TaskAlpha</td><td>Same as contributors</td></tr>
+      <tr><td>Partner organisation</td><td>TaskAlpha Vendor Agreement; operators sign up on TaskAlpha</td><td>TaskAlpha</td><td>Same rate per category; the partner sets its own split with its operators</td></tr>
+      <tr><td>Workplace partner</td><td>Flipside Site Access Agreement</td><td>Flipside</td><td>Site fee; staff who record join as contributors</td></tr>
+      <tr><td>Session participant</td><td>Flipside, one session</td><td>Flipside</td><td>Cash at project rate, consent and release form, 0% EWT, two projects in 12 months at most</td></tr>
+      <tr><td>Legacy contributor</td><td>Flipside</td><td>Flipside</td><td>Unchanged, with 5% or 10% withholding; moves to TaskAlpha at renewal after onboarding</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Partner channel, decided 27 October: one route only. Every partner organisation contracts with TaskAlpha as a vendor; there is no Flipside-paper partner channel on Pulsar. The platform signs up contributors from any country except Singapore and sanctioned lists.</p>
+</section>
+
+<section id="pulsar">
+  <div class="sec-head"><p class="eyebrow">Project Pulsar &middot; OpenAI B1 SOW #2</p><h2>Egocentric video at scale, captured in the Philippines</h2>
+  <p class="sub">Pulsar follows the 1,000-hour Nova pilot. Flipside contracts with OpenAI; the Philippines is the only country on record. Owner: Harrold Zolina.</p></div>
+  <div class="figs">
+    <div class="fig"><b>100,000</b><span>accepted hours over about seven months</span></div>
+    <div class="fig"><b>USD 25</b><span>per accepted hour</span></div>
+    <div class="fig"><b>USD 3.125M</b><span>contract cap, plus a performance bonus</span></div>
+    <div class="fig"><b>Jan 2027</b><span>expected revenue start</span></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Hardware</h3><p>270 caps bought by OpenAI, shipping to Cebu, mid-November at the earliest after rework. None inspected or calibrated yet.</p></div>
+    <div class="card"><h3>Rules from 8 October</h3><p>100% hard tasks and much tighter per-site hour caps. Less yield per site; the main driver of lower contribution.</p></div>
+    <div class="card"><h3>Economics, Cost Model v5</h3><p>Program contribution about USD 539k. SOW 1 fee to TaskAlpha about USD 945k at a 5% markup placeholder, pending the transfer-pricing benchmark.</p></div>
+    <div class="card"><h3>Hubs</h3><p>Activate Unit 902 at Insular, Cebu (only power, internet and fit-out are new cost) and take serviced seats in Eastwood.</p></div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><h3>Pay</h3><p>USD 6 to 8 per hour by environment category. Minimum withdrawal USD 10.</p></div>
+    <div class="card"><h3>Scope</h3><p>Residential is out. Childcare, public safety and healthcare need OpenAI approval before recruiting.</p></div>
+    <div class="card"><h3>Equipment</h3><p>Flipside loans the headset and keeps OpenAI custody records. TaskAlpha handles set-up and earnings set-off.</p></div>
+    <div class="card"><h3>Recruitment</h3><p>&ldquo;Project Pulsar&rdquo; ads under TaskAlpha x Flipside, sign-up at taskalpha.io/join/pulsar. Paced to the hardware.</p></div>
+    <div class="card"><h3>Partners</h3><p>One route: TaskAlpha vendor, operators on TaskAlpha.</p></div>
+    <div class="card"><h3>Agencies</h3><p>S1NAG and Island Technologies need Vendor Agreements and OpenAI written approval first.</p></div>
+  </div>
+  <p class="note">Contributor and partner documents say &ldquo;recording hardware&rdquo; or &ldquo;equipment&rdquo;, not the product name.</p>
+</section>
+
+<section id="rules">
+  <div class="sec-head"><p class="eyebrow">Ground rules</p><h2>What we don&rsquo;t do</h2></div>
+  <ol class="rules">
+    <li>Pay, top up or front money from Flipside for a TaskAlpha contributor or vendor.</li>
+    <li>Agree rates outside the TaskAlpha rate card.</li>
+    <li>Run contributor or vendor marketing under the Flipside name.</li>
+    <li>Put legacy contributors in a TaskAlpha-paid project before they are onboarded.</li>
+    <li>Sign Pulsar partner organisations on Flipside paper.</li>
+    <li>Give TaskAlpha work beyond data collection.</li>
+  </ol>
+</section>
+
+<section id="calendar">
+  <div class="sec-head"><p class="eyebrow">Calendar</p><h2>January 2027 is when it all goes live</h2></div>
+  <div class="table-box"><table class="ref">
+    <thead><tr><th>When</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td>5 Oct to 31 Dec 2026</td><td>Pilot on the draft agreements, no charge either way</td></tr>
+      <tr><td>Mid-November 2026</td><td>Earliest Pulsar hardware arrival in Cebu</td></tr>
+      <tr class="hl"><td>January 2027</td><td>Eric Suzuki in Singapore; agreements signed; billing starts; Pulsar revenue starts</td></tr>
+      <tr><td>Monthly, days 1 to 3</td><td>Payout team closes prior-month batches, exports project summary and legacy split</td></tr>
+      <tr><td>Monthly</td><td>SOW 1 fee and SOW 2 recharge invoiced on estimate</td></tr>
+      <tr><td>Quarterly</td><td>Service Delivery Manager signs the FTE allocation; recharge reconciled to it</td></tr>
+      <tr><td>Annually</td><td>Confirm the who-does-what table</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>Internal only. Do not forward outside Flipside and TaskAlpha: the agreements are drafts and the OpenAI contract is confidential.</footer>
+
+</div>
+
